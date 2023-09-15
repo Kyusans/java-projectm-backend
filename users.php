@@ -6,15 +6,11 @@
       function login($json){
         include "connection.php";
         //{"username":"kobi", "password":"kobi123"}
-
         $json = json_decode($json, true);
-        $username = $json["username"];
-        $password = $json["password"];
         $sql = "SELECT * FROM tblusers WHERE user_username = :username AND user_password = :password";
-
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":username", $username);
-        $stmt->bindParam(":password", $password);
+        $stmt->bindParam(":username", $json["user_username"]);
+        $stmt->bindParam(":password", $json["user_password"]);
         $returnValue = 0;
 
         if($stmt->execute()){
@@ -44,15 +40,28 @@
       function addStudent($json){
         include "connection.php";
         $json = json_decode($json, true);
-        // {"fullName":"Kobid Macario", "schoolId":"1111-2222-3333", "birthday":"01/02/2003", "course":"bsit", "lrn":"123456789012"}
-        $sql = "INSERT INTO tblstudents(stud_fullName, stud_schoolId, stud_birthday, stud_course, stud_lrn) ";
-        $sql .= " VALUES(:fullName, :schoolId, :birthday, :course, :lrn)";
+        // {"schoolId":"1111-2222-3333","fullName":"Kobid Macario","gender":"Female", "email":"kobid@gmail.com", "courseCode":"bsit", "yearLevel":1, "dateEnrolled": "03/03/2023", "address":"CDO"}
+        $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_dateEnrolled, stud_address) ";
+        $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :dateEnrolled, :address) ";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":fullName", $json["fullName"]);
-        $stmt->bindParam(":schoolId", $json["schoolId"]);
-        $stmt->bindParam(":birthday", $json["birthday"]);
-        $stmt->bindParam(":course", $json["course"]);
-        $stmt->bindParam(":lrn", $json["lrn"]);
+        // $stmt->bindParam(":schoolId", $json["schoolId"]);
+        // $stmt->bindParam(":fullName", $json["fullName"]);
+        // $stmt->bindParam(":gender", $json["gender"]);
+        // $stmt->bindParam(":email", $json["email"]);
+        // $stmt->bindParam(":courseCode", $json["courseCode"]);
+        // $stmt->bindParam(":yearLevel", $json["yearLevel"]);
+        // $stmt->bindParam(":dateEnrolled", $json["dateEnrolled"]);
+        // $stmt->bindParam(":address", $json["address"]);
+        
+        // for java
+        $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
+        $stmt->bindParam(":fullName", $json["stud_fullName"]);
+        $stmt->bindParam(":gender", $json["stud_gender"]);
+        $stmt->bindParam(":email", $json["stud_email"]);
+        $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
+        $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
+        $stmt->bindParam(":dateEnrolled", $json["stud_dateEnrolled"]);
+        $stmt->bindParam(":address", $json["stud_address"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }
@@ -65,12 +74,15 @@
         $sql .= "SET stud_fullName=:fullName, stud_schoolId=:schoolId, stud_birthday=:birthday, stud_course=:course, stud_lrn=:lrn ";
         $sql .= "WHERE stud_id = :studId";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":fullName", $json["fullName"]);
-        $stmt->bindParam(":schoolId", $json["schoolId"]);
-        $stmt->bindParam(":birthday", $json["birthday"]);
-        $stmt->bindParam(":course", $json["course"]);
-        $stmt->bindParam(":lrn", $json["lrn"]);
-        $stmt->bindParam(":studId", $json["studId"]);
+        $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
+        $stmt->bindParam(":lname", $json["stud_lname"]);
+        $stmt->bindParam(":fname", $json["stud_fname"]);
+        $stmt->bindParam(":mname", $json["stud_mname"]);
+        $stmt->bindParam(":email", $json["stud_email"]);
+        $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
+        $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
+        $stmt->bindParam(":dateEnrolled", $json["stud_dateEnrolled"]);
+        $stmt->bindParam(":address", $json["stud_address"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }

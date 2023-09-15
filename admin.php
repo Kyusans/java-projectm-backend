@@ -35,8 +35,8 @@
 
       function updateStaff($json){
         include "connection.php";
-        $json = json_decode($json, true);
         // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "staffId":"0000-2672-9443", "birthday":"01/02/2003", "userId":3}
+        $json = json_decode($json, true);
         $sql = "UPDATE tblusers ";
         $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_staffId=:staffId, user_birthday=:birthday ";
         $sql .= "WHERE user_id = :userId";
