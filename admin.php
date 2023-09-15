@@ -20,33 +20,31 @@
       function addStaff($json){
         include "connection.php";
         $json = json_decode($json, true);
-        //{"userName":"joey", "password":"joey", "fullName":"Joey Joey", "staffId":"1221-2332-3443", "birthday":"01/02/2003"}
-        $sql = "INSERT INTO tblusers(user_username, user_password , user_fullName, user_staffId, user_birthday) ";
-        $sql .= " VALUES( :userName, :password, :fullName, :staffId, :birthday)";
+        //{"userName":"joey", "password":"joey", "fullName":"Joey Joey", "email":"jioe@gmail.com"}
+        $sql = "INSERT INTO tblusers(user_username, user_password , user_fullName, user_email, user_level) ";
+        $sql .= " VALUES( :userName, :password, :fullName, :email, 90)";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":userName", $json["userName"]);
-        $stmt->bindParam(":password", $json["password"]);
-        $stmt->bindParam(":fullName", $json["fullName"]);
-        $stmt->bindParam(":staffId", $json["staffId"]);
-        $stmt->bindParam(":birthday", $json["birthday"]);
+        $stmt->bindParam(":userName", $json["user_username"]);
+        $stmt->bindParam(":password", $json["user_password"]);
+        $stmt->bindParam(":fullName", $json["user_fullName"]);
+        $stmt->bindParam(":email", $json["user_email"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }
 
       function updateStaff($json){
         include "connection.php";
-        // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "staffId":"0000-2672-9443", "birthday":"01/02/2003", "userId":3}
+        // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "email":"jioe@gmail.com", "userId":3}
         $json = json_decode($json, true);
         $sql = "UPDATE tblusers ";
-        $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_staffId=:staffId, user_birthday=:birthday ";
+        $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_email=:email ";
         $sql .= "WHERE user_id = :userId";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":userName", $json["userName"]);
-        $stmt->bindParam(":password", $json["password"]);
-        $stmt->bindParam(":fullName", $json["fullName"]);
-        $stmt->bindParam(":staffId", $json["staffId"]);
-        $stmt->bindParam(":birthday", $json["birthday"]);
-        $stmt->bindParam(":userId", $json["userId"]);
+        $stmt->bindParam(":userName", $json["user_userName"]);
+        $stmt->bindParam(":password", $json["user_password"]);
+        $stmt->bindParam(":fullName", $json["user_fullName"]);
+        $stmt->bindParam(":email", $json["user_email"]);
+        $stmt->bindParam(":userId", $json["user_userId"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }

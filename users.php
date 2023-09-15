@@ -44,15 +44,6 @@
         $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_dateEnrolled, stud_address) ";
         $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :dateEnrolled, :address) ";
         $stmt = $conn->prepare($sql);
-        // $stmt->bindParam(":schoolId", $json["schoolId"]);
-        // $stmt->bindParam(":fullName", $json["fullName"]);
-        // $stmt->bindParam(":gender", $json["gender"]);
-        // $stmt->bindParam(":email", $json["email"]);
-        // $stmt->bindParam(":courseCode", $json["courseCode"]);
-        // $stmt->bindParam(":yearLevel", $json["yearLevel"]);
-        // $stmt->bindParam(":dateEnrolled", $json["dateEnrolled"]);
-        // $stmt->bindParam(":address", $json["address"]);
-        
         // for java
         $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
         $stmt->bindParam(":fullName", $json["stud_fullName"]);
