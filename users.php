@@ -37,6 +37,23 @@
         return $returnValue;
       }
 
+      function getSelectedStudent($json){
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT * FROM tblstudents WHERE stud_id = :studId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":studId", $json["stud_Id"]);
+        $returnValue = 0;
+        if($stmt->execute()){
+          if($stmt->rowCount() > 0){
+            $rs = $stmt->fetch(PDO::FETCH_ASSOC);
+            $returnValue = json_encode($rs);
+          }
+        }
+
+        return $returnValue;
+      }
+
       function addStudent($json){
         include "connection.php";
         $json = json_decode($json, true);
@@ -108,6 +125,9 @@
         break;
       case "deleteStudent":
         echo $user->deleteStudent($json);
+        break;
+      case "getSelectedStudent":
+        echo $user->getSelectedStudent($json);
         break;
     }
 ?>
