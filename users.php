@@ -61,7 +61,6 @@
         $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_dateEnrolled, stud_address) ";
         $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :dateEnrolled, :address) ";
         $stmt = $conn->prepare($sql);
-        // for java
         $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
         $stmt->bindParam(":fullName", $json["stud_fullName"]);
         $stmt->bindParam(":gender", $json["stud_gender"]);
@@ -77,22 +76,21 @@
       function updateStudent($json){
         include "connection.php";
         $json = json_decode($json, true);
-        // {"fullName":"Kobid Mac", "schoolId":"1441-2552-3663", "birthday":"01/02/2003", "course":"bwesit", "lrn":"122346789012", "studId": 1}
-        $sql = "UPDATE tblstudents ";
-        $sql .= "SET stud_fullName=:fullName, stud_schoolId=:schoolId, stud_birthday=:birthday, stud_course=:course, stud_lrn=:lrn ";
-        $sql .= "WHERE stud_id = :studId";
+        // {"schoolId":"1111-2222-3333","fullName":"Kobid Macario","gender":"Female", "email":"kobid@gmail.com", "courseCode":"bsit", "yearLevel":1, "dateEnrolled": "03/03/2023", "address":"CDO"}
+        $sql = "UPDATE tblstudents SET stud_schoolId = :schoolId, stud_fullName = :fullName, stud_gender = :gender, stud_email = :email, stud_courseCode = :courseCode, stud_yearLevel = :yearLevel, stud_dateEnrolled = :dateEnrolled, stud_address = :address ";
+        $sql.= " WHERE stud_id = :studId ";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
-        $stmt->bindParam(":lname", $json["stud_lname"]);
-        $stmt->bindParam(":fname", $json["stud_fname"]);
-        $stmt->bindParam(":mname", $json["stud_mname"]);
-        $stmt->bindParam(":email", $json["stud_email"]);
-        $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
-        $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
-        $stmt->bindParam(":dateEnrolled", $json["stud_dateEnrolled"]);
-        $stmt->bindParam(":address", $json["stud_address"]);
+        $stmt->bindParam(':studId', $json["stud_id"]);
+        $stmt->bindParam(':schoolId', $json["stud_schoolId"]);
+        $stmt->bindParam(':fullName', $json["stud_fullName"]);
+        $stmt->bindParam(':gender', $json["stud_gender"]);
+        $stmt->bindParam(':email', $json["stud_email"]);
+        $stmt->bindParam(':courseCode', $json["stud_courseCode"]);
+        $stmt->bindParam(':yearLevel', $json["stud_yearLevel"]);
+        $stmt->bindParam(':dateEnrolled', $json["stud_dateEnrolled"]);
+        $stmt->bindParam(':address', $json["stud_address"]);
         $stmt->execute();
-        return $stmt->rowCount() > 0 ? 1 : 0;
+        return $stmt->rowCount() > 0? 1 : 0;
       }
 
       function deleteStudent($json){
