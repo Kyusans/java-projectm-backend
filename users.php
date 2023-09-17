@@ -94,15 +94,33 @@
       }
 
       function deleteStudent($json){
-        //{"studId":1}
+        //{"studId":3, "userId":1}
         include "connection.php";
-         $json = json_decode($json, true);
-         $sql = "DELETE FROM tblstudents WHERE stud_id = :studId";
-         $stmt = $conn->prepare($sql);
-         $stmt->bindParam(":studId", $json["studId"]);
-         $stmt->execute();
-         return $stmt->rowCount() > 0? 1 : 0;
-       }
+        $json = json_decode($json, true);
+        $conn->beginTransaction();
+        try {
+          $sql = "DELETE FROM tblstudents WHERE stud_id = :studId";
+          $stmt = $conn->prepare($sql);
+          $stmt->bindParam(":studId", $json["studId"]);
+          $stmt->execute();
+          if($stmt->rowCount() <= 0){
+          $conn->rollBack();
+          return 0;
+          }
+  
+          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_studId) ";
+          $sql2 .= " VALUES(:userId, :studentId)";
+          $stmt2 = $conn->prepare($sql2);
+          $stmt2->bindParam(":userId", $json["userId"]);
+          $stmt2->bindParam(":studentId", $json["studId"]);
+          $stmt2->execute();
+          $conn->commit();
+          return 1;
+        } catch (PDOException $e) {
+          $conn->rollBack();
+          return 0;
+        }
+      }
     }
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
     $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -121,11 +139,11 @@
       case "updateStudent":
         echo $user->updateStudent($json);
         break;
-      case "deleteStudent":
-        echo $user->deleteStudent($json);
-        break;
       case "getSelectedStudent":
         echo $user->getSelectedStudent($json);
+        break;
+      case "deleteStudent":
+        echo $user->deleteStudent($json);
         break;
     }
 ?>
