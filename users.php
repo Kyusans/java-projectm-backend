@@ -56,31 +56,46 @@
 
       function addStudent($json){
         include "connection.php";
+        // {"schoolId":"948576","fullName":"Kobid Rogan","gender":"Female", "email":"kobid123@gmail.com", "courseCode":"bsit", "yearLevel":1, "address":"CDO", "userId":1}
         $json = json_decode($json, true);
-        // {"schoolId":"1111-2222-3333","fullName":"Kobid Macario","gender":"Female", "email":"kobid@gmail.com", "courseCode":"bsit", "yearLevel":1, "dateEnrolled": "03/03/2023", "address":"CDO"}
-        $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_dateEnrolled, stud_address) ";
-        $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :dateEnrolled, :address) ";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
-        $stmt->bindParam(":fullName", $json["stud_fullName"]);
-        $stmt->bindParam(":gender", $json["stud_gender"]);
-        $stmt->bindParam(":email", $json["stud_email"]);
-        $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
-        $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
-        $stmt->bindParam(":dateEnrolled", $json["stud_dateEnrolled"]);
-        $stmt->bindParam(":address", $json["stud_address"]);
-        $stmt->execute();
-        return $stmt->rowCount() > 0 ? 1 : 0;
+        $conn->beginTransaction();
+        try {
+          $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_address) ";
+          $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :address) ";
+          $stmt = $conn->prepare($sql);
+          $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
+          $stmt->bindParam(":fullName", $json["stud_fullName"]);
+          $stmt->bindParam(":gender", $json["stud_gender"]);
+          $stmt->bindParam(":email", $json["stud_email"]);
+          $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
+          $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
+          $stmt->bindParam(":address", $json["stud_address"]);
+          $stmt->execute();
+          if($stmt->rowCount() <= 0) {
+            $conn->rollBack();
+            return 0;
+          }
+          $sql2 = "INSERT INTO tbladdstudenthistory(addhist_userId, addhist_studSchoolId) VALUES(:userId, :studentId)";
+          $stmt2 = $conn->prepare($sql2);
+          $stmt2->bindParam(':userId', $json["user_id"]);
+          $stmt2->bindParam(':studentId', $json["stud_schoolId"]);
+          $stmt2->execute();
+          $conn->commit();
+          return 1;
+        } catch (PDOException $e) {
+          $conn->rollBack();
+          return 0;
+        }
       }
 
       function updateStudent($json){
-        // {"schoolId":"1111-2222-3333","fullName":"Kobid Macario","gender":"Female", "email":"kobid@gmail.com", "courseCode":"bsit", "yearLevel":1, "dateEnrolled": "03/03/2023", "address":"CDO", "userId":1}   
+        // {"schoolId":"1111-2222-3333","fullName":"Kobid Macario","gender":"Female", "email":"kobid@gmail.com", "courseCode":"bsit", "yearLevel":1, "address":"CDO", "userId":1}   
         include "connection.php";    
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
           $sql = "UPDATE tblstudents SET stud_schoolId = :schoolId, stud_fullName = :fullName, stud_gender = :gender, stud_email = :email, ";
-          $sql .= "stud_courseCode = :courseCode, stud_yearLevel = :yearLevel, stud_dateEnrolled = :dateEnrolled, stud_address = :address ";
+          $sql .= "stud_courseCode = :courseCode, stud_yearLevel = :yearLevel, stud_address = :address ";
           $sql .= "WHERE stud_id = :studId ";
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(':studId', $json["stud_id"]);
@@ -90,7 +105,6 @@
           $stmt->bindParam(':email', $json["stud_email"]);
           $stmt->bindParam(':courseCode', $json["stud_courseCode"]);
           $stmt->bindParam(':yearLevel', $json["stud_yearLevel"]);
-          $stmt->bindParam(':dateEnrolled', $json["stud_dateEnrolled"]);
           $stmt->bindParam(':address', $json["stud_address"]);
           $stmt->execute();
           if($stmt->rowCount() <= 0) {
@@ -99,10 +113,11 @@
           }
           $sql2 = "INSERT INTO tblupdatestudenthistory(uphist_userId, uphist_studId) VALUES(:userId, :studentId)";
           $stmt2 = $conn->prepare($sql2);
-          $stmt2->bindParam(':userId', $json["userId"]);
+          $stmt2->bindParam(':userId', $json["user_id"]);
           $stmt2->bindParam(':studentId', $json["stud_id"]);
           $stmt2->execute();
           $conn->commit();
+          return 1;
         } catch (PDOException $e) {
           $conn->rollBack();
           return 0;
@@ -110,25 +125,26 @@
       }
 
       function deleteStudent($json){
-        //{"studId":3, "userId":1}
+        //{"studId":3, "studFullName":"kobi","userId":1}
         include "connection.php";
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
           $sql = "DELETE FROM tblstudents WHERE stud_id = :studId";
           $stmt = $conn->prepare($sql);
-          $stmt->bindParam(":studId", $json["studId"]);
+          $stmt->bindParam(":studId", $json["stud_id"]);
           $stmt->execute();
+          // echo "Sql1: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0){
-          $conn->rollBack();
-          return 0;
+            $conn->rollBack();
+            return "sql1 diri";
           }
-  
-          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_studId) VALUES(:userId, :studentId)";
+          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_studFullName) VALUES(:userId, :fullName)";
           $stmt2 = $conn->prepare($sql2);
-          $stmt2->bindParam(":userId", $json["userId"]);
-          $stmt2->bindParam(":studentId", $json["studId"]);
+          $stmt2->bindParam(":userId", $json["user_id"]);
+          $stmt2->bindParam(":fullName", $json["stud_fullName"]);
           $stmt2->execute();
+          // echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();
           return 1;
         } catch (PDOException $e) {

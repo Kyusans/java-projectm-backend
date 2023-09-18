@@ -59,7 +59,31 @@
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }
+
+      function getUpdateHistory($json){
+        //{"userId":3}
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT b.user_fullName, c.stud_fullName ";
+        $sql .= "FROM tblupdatestudenthistory as a ";
+        $sql .= "INNER JOIN tblusers as b ON a.uphist_userId = b.user_id ";
+        $sql .= "INNER JOIN tblstudents as c ON a.uphist_studId = c.stud_id ";
+        $sql .= "WHERE a.uphist_userId = :userId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":userId", $json["userId"]);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->execute()){
+          if($stmt->rowCount() > 0){
+            $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $returnValue = json_encode($rs);
+          }
+        }
+        return $returnValue;
+      }
     }
+
+
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
     $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -77,6 +101,9 @@
         break;
       case "deleteStaff":
         echo $admin->deleteStaff($json);
+        break;
+      case "getUpdateHistory":
+        echo $admin->getUpdateHistory($json);
         break;
     }
 ?>
