@@ -81,9 +81,42 @@
         }
         return $returnValue;
       }
+
+      function getAddStudentHistory($json){
+        //{"userId":3}
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT b.user_fullName, c.stud_fullName ";
+        $sql.= "FROM tbladdstudenthistory as a ";
+        $sql.= "INNER JOIN tblusers as b ON a.addhist_userId = b.user_id ";
+        $sql.= "INNER JOIN tblstudents as c ON a.addhist_studSchoolId = c.stud_school_id ";
+        $sql.= "WHERE a.addhist_userId = :userId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":userId", $json["userId"]);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->rowCount() > 0){
+          $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          $returnValue = json_encode($rs);
+        }
+        return $returnValue;
+      }
+
+      // function getDeleteHistory($json){
+      //   //{"userId":3}
+      //   include "connection.php";
+      //   $json = json_decode($json, true);
+      //   $sql = "SELECT b.user_fullName, c.stud_fullName ";
+      //   $sql.= "FROM tbldeletestudenthistory as a ";
+      //   $sql.= "INNER JOIN tblusers as b ON a.delhist_userId = b.user_id ";
+      //   $sql.= "INNER JOIN tblstudents as c ON a.delhist_studId = c.stud_id ";
+      //   $sql.= "WHERE a.delhist_userId = :userId";
+      //   $stmt = $conn->prepare($sql);
+      //   $stmt->bindParam(":userId", $json["userId"]);
+      //   $stmt->execute();
+      //   $returnValue = 0;
+      // }
     }
-
-
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
     $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -105,5 +138,11 @@
       case "getUpdateHistory":
         echo $admin->getUpdateHistory($json);
         break;
+      case "getAddStudentHistory":
+        echo $admin->getAddStudentHistory($json);
+        break;
+      // case "getDeleteStudentHistory":
+      //   echo $admin->getDeleteHistory($json);
+      //   break;
     }
 ?>

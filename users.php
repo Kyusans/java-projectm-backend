@@ -60,8 +60,8 @@
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
-          $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_address) ";
-          $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :address) ";
+          $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_address, stud_school_id) ";
+          $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :address, :schoolId) ";
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
           $stmt->bindParam(":fullName", $json["stud_fullName"]);
@@ -111,17 +111,20 @@
             $conn->rollBack();
             return 0;
           }
-          $sql2 = "INSERT INTO tblupdatestudenthistory(uphist_userId, uphist_studId) VALUES(:userId, :studentId)";
+
+          $sql2 = "INSERT INTO tblupdatestudenthistory(uphist_userId, uphist_studId) VALUES(:userId, :studId)";
           $stmt2 = $conn->prepare($sql2);
           $stmt2->bindParam(':userId', $json["user_id"]);
-          $stmt2->bindParam(':studentId', $json["stud_id"]);
+          $stmt2->bindParam(':studId', $json["stud_id"]);
           $stmt2->execute();
+          
           $conn->commit();
           return 1;
         } catch (PDOException $e) {
           $conn->rollBack();
           return 0;
         }
+
       }
 
       function deleteStudent($json){
