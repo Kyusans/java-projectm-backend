@@ -3,25 +3,25 @@
 
     class User{
 
-      function login($json){
+      function login($json) {
         include "connection.php";
-        //{"username":"kobi", "password":"kobi123"}
         $json = json_decode($json, true);
-        $sql = "SELECT * FROM tblusers WHERE user_username = :username AND user_password = :password";
+        $username = strtolower($json["user_username"]);   
+        $sql = "SELECT * FROM tblusers WHERE LOWER(user_username) = :username AND BINARY user_password = :password";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":username", $json["user_username"]);
+        $stmt->bindParam(":username", $username);
         $stmt->bindParam(":password", $json["user_password"]);
         $returnValue = 0;
-
-        if($stmt->execute()){
-          if($stmt->rowCount() > 0){
-            $rs = $stmt->fetch(PDO::FETCH_ASSOC);
-            $returnValue = json_encode($rs);
-          }
+        if ($stmt->execute()) {
+            if ($stmt->rowCount() > 0) {
+                $rs = $stmt->fetch(PDO::FETCH_ASSOC);
+                $returnValue = json_encode($rs);
+            }
         }
-
+    
         return $returnValue;
-      }
+    }
+    
 
       function getAllStudent(){
         include "connection.php";
@@ -140,9 +140,9 @@
           // echo "Sql1: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0){
             $conn->rollBack();
-            return "sql1 diri";
+            return 0;
           }
-          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_studFullName) VALUES(:userId, :fullName)";
+          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_fullName) VALUES(:userId, :fullName)";
           $stmt2 = $conn->prepare($sql2);
           $stmt2->bindParam(":userId", $json["user_id"]);
           $stmt2->bindParam(":fullName", $json["stud_fullName"]);
