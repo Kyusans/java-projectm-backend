@@ -22,7 +22,6 @@
         return $returnValue;
     }
     
-
       function getAllStudent(){
         include "connection.php";
         $sql = "SELECT * FROM tblstudents ORDER BY stud_fullName";
@@ -56,20 +55,43 @@
 
       function addStudent($json){
         include "connection.php";
-        // {"schoolId":"948576","fullName":"Kobid Rogan","gender":"Female", "email":"kobid123@gmail.com", "courseCode":"bsit", "yearLevel":1, "address":"CDO", "userId":1}
+        // {"stud_schoolId": "948576", "stud_fullName": "Kobid Rogan", "stud_birthday": "1995-05-15", "stud_birthplace": "City Name", "stud_gender": "Female", "stud_religion": "Christian", "stud_address": "123 Main Street", "stud_email": "kobid123@gmail.com", "stud_contactNumber": "1234567890", "stud_prevSchool": "Previous School Name", "stud_course": "bsit", "stud_gradeLevel": "12th Grade", "stud_yearGraduated": "2020", "stud_fatherName": "John Rogan", "stud_fatherOccupation": "Engineer", "stud_fatherContactNumber": "9876543210", "stud_motherName": "Mary Rogan", "stud_motherOccupation": "Teacher", "stud_motherContactNumber": "9876543211", "stud_emergencyName": "Emergency Contact Name", "stud_emergencyRelationship": "Relative", "stud_emergencyPhone": "9998887777", "stud_emergencyAddress": "Emergency Contact Address", "stud_school_id": "948576", "user_id": 4}
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
-          $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_gender, stud_email, stud_courseCode, stud_yearLevel, stud_address, stud_school_id) ";
-          $sql .= " VALUES(:schoolId, :fullName, :gender, :email, :courseCode, :yearLevel, :address, :schoolId) ";
+          $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_birthday, stud_birthplace, stud_gender, stud_religion, stud_address, stud_email, ";
+          $sql .= "stud_contactNumber, stud_prevSchool, stud_course, stud_gradeLevel, stud_yearGraduated, stud_fatherName, stud_fatherOccupation, stud_fatherContactNumber, ";
+          $sql .= "stud_motherName, stud_motherOccupation, stud_motherContactNumber, stud_emergencyName, stud_emergencyRelationship, stud_emergencyPhone, stud_emergencyAddress, ";
+          $sql .= "stud_school_id) ";
+          $sql .= "VALUES(:schoolId, :fullName, :birthday, :birthplace, :gender, :religion, :address, :email, ";
+          $sql .= ":contactNumber, :prevSchool, :course, :gradeLevel, :yearGraduated, :fatherName, :fatherOccupation, :fatherContactNumber, ";
+          $sql .= ":motherName, :motherOccupation, :motherContactNumber, :emergencyName, :emergencyRelationship, :emergencyPhone, :emergencyAddress, ";
+          $sql .= ":school_id)";
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
           $stmt->bindParam(":fullName", $json["stud_fullName"]);
+          $stmt->bindParam(":birthday", $json["stud_birthday"]);
+          $stmt->bindParam(":birthplace", $json["stud_birthplace"]);
           $stmt->bindParam(":gender", $json["stud_gender"]);
-          $stmt->bindParam(":email", $json["stud_email"]);
-          $stmt->bindParam(":courseCode", $json["stud_courseCode"]);
-          $stmt->bindParam(":yearLevel", $json["stud_yearLevel"]);
+          $stmt->bindParam(":religion", $json["stud_religion"]);
           $stmt->bindParam(":address", $json["stud_address"]);
+          $stmt->bindParam(":email", $json["stud_email"]);
+          $stmt->bindParam(":contactNumber", $json["stud_contactNumber"]);
+          $stmt->bindParam(":prevSchool", $json["stud_prevSchool"]);
+          $stmt->bindParam(":course", $json["stud_course"]);
+          $stmt->bindParam(":gradeLevel", $json["stud_gradeLevel"]);
+          $stmt->bindParam(":yearGraduated", $json["stud_yearGraduated"]);
+          $stmt->bindParam(":fatherName", $json["stud_fatherName"]);
+          $stmt->bindParam(":fatherOccupation", $json["stud_fatherOccupation"]);
+          $stmt->bindParam(":fatherContactNumber", $json["stud_fatherContactNumber"]);
+          $stmt->bindParam(":motherName", $json["stud_motherName"]);
+          $stmt->bindParam(":motherOccupation", $json["stud_motherOccupation"]);
+          $stmt->bindParam(":motherContactNumber", $json["stud_motherContactNumber"]);
+          $stmt->bindParam(":emergencyName", $json["stud_emergencyName"]);
+          $stmt->bindParam(":emergencyRelationship", $json["stud_emergencyRelationship"]);
+          $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
+          $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
+          $stmt->bindParam(":school_id", $json["stud_school_id"]);
           $stmt->execute();
           if($stmt->rowCount() <= 0) {
             $conn->rollBack();
