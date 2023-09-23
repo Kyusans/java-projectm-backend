@@ -117,19 +117,44 @@
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
-          $sql = "UPDATE tblstudents SET stud_schoolId = :schoolId, stud_fullName = :fullName, stud_gender = :gender, stud_email = :email, ";
-          $sql .= "stud_courseCode = :courseCode, stud_yearLevel = :yearLevel, stud_address = :address ";
-          $sql .= "WHERE stud_id = :studId ";
+          $sql = "UPDATE tblstudents SET ";
+          $sql .= "stud_fullName = :fullName, stud_birthday = :birthday, stud_birthplace = :birthplace, ";
+          $sql .= "stud_gender = :gender, stud_religion = :religion, stud_address = :address, stud_email = :email, ";
+          $sql .= "stud_contactNumber = :contactNumber, stud_prevSchool = :prevSchool, stud_course = :course, ";
+          $sql .= "stud_gradeLevel = :gradeLevel, stud_yearGraduated = :yearGraduated, ";
+          $sql .= "stud_fatherName = :fatherName, stud_fatherOccupation = :fatherOccupation, ";
+          $sql .= "stud_fatherContactNumber = :fatherContactNumber, stud_motherName = :motherName, ";
+          $sql .= "stud_motherOccupation = :motherOccupation, stud_motherContactNumber = :motherContactNumber, ";
+          $sql .= "stud_emergencyName = :emergencyName, stud_emergencyRelationship = :emergencyRelationship, ";
+          $sql .= "stud_emergencyPhone = :emergencyPhone, stud_emergencyAddress = :emergencyAddress ";
+          $sql .= "WHERE stud_schoolId = :schoolId";
+          
           $stmt = $conn->prepare($sql);
-          $stmt->bindParam(':studId', $json["stud_id"]);
-          $stmt->bindParam(':schoolId', $json["stud_schoolId"]);
-          $stmt->bindParam(':fullName', $json["stud_fullName"]);
-          $stmt->bindParam(':gender', $json["stud_gender"]);
-          $stmt->bindParam(':email', $json["stud_email"]);
-          $stmt->bindParam(':courseCode', $json["stud_courseCode"]);
-          $stmt->bindParam(':yearLevel', $json["stud_yearLevel"]);
-          $stmt->bindParam(':address', $json["stud_address"]);
+          $stmt->bindParam(":fullName", $json["stud_fullName"]);
+          $stmt->bindParam(":birthday", $json["stud_birthday"]);
+          $stmt->bindParam(":birthplace", $json["stud_birthplace"]);
+          $stmt->bindParam(":gender", $json["stud_gender"]);
+          $stmt->bindParam(":religion", $json["stud_religion"]);
+          $stmt->bindParam(":address", $json["stud_address"]);
+          $stmt->bindParam(":email", $json["stud_email"]);
+          $stmt->bindParam(":contactNumber", $json["stud_contactNumber"]);
+          $stmt->bindParam(":prevSchool", $json["stud_prevSchool"]);
+          $stmt->bindParam(":course", $json["stud_course"]);
+          $stmt->bindParam(":gradeLevel", $json["stud_gradeLevel"]);
+          $stmt->bindParam(":yearGraduated", $json["stud_yearGraduated"]);
+          $stmt->bindParam(":fatherName", $json["stud_fatherName"]);
+          $stmt->bindParam(":fatherOccupation", $json["stud_fatherOccupation"]);
+          $stmt->bindParam(":fatherContactNumber", $json["stud_fatherContactNumber"]);
+          $stmt->bindParam(":motherName", $json["stud_motherName"]);
+          $stmt->bindParam(":motherOccupation", $json["stud_motherOccupation"]);
+          $stmt->bindParam(":motherContactNumber", $json["stud_motherContactNumber"]);
+          $stmt->bindParam(":emergencyName", $json["stud_emergencyName"]);
+          $stmt->bindParam(":emergencyRelationship", $json["stud_emergencyRelationship"]);
+          $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
+          $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
+          $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
           $stmt->execute();
+          echo "Sql1: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0) {
             $conn->rollBack();
             return 0;
@@ -140,7 +165,7 @@
           $stmt2->bindParam(':userId', $json["user_id"]);
           $stmt2->bindParam(':studId', $json["stud_id"]);
           $stmt2->execute();
-          
+          echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();
           return 1;
         } catch (PDOException $e) {
