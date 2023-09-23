@@ -55,7 +55,7 @@
 
       function addStudent($json){
         include "connection.php";
-        // {"stud_schoolId": "948576", "stud_fullName": "Kobid Rogan", "stud_birthday": "1995-05-15", "stud_birthplace": "City Name", "stud_gender": "Female", "stud_religion": "Christian", "stud_address": "123 Main Street", "stud_email": "kobid123@gmail.com", "stud_contactNumber": "1234567890", "stud_prevSchool": "Previous School Name", "stud_course": "bsit", "stud_gradeLevel": "12th Grade", "stud_yearGraduated": "2020", "stud_fatherName": "John Rogan", "stud_fatherOccupation": "Engineer", "stud_fatherContactNumber": "9876543210", "stud_motherName": "Mary Rogan", "stud_motherOccupation": "Teacher", "stud_motherContactNumber": "9876543211", "stud_emergencyName": "Emergency Contact Name", "stud_emergencyRelationship": "Relative", "stud_emergencyPhone": "9998887777", "stud_emergencyAddress": "Emergency Contact Address", "stud_school_id": "948576", "user_id": 4}
+        // {"stud_schoolId": "948576", "stud_fullName": "Kobid Rogan", "stud_birthday": "1995-05-15", "stud_birthplace": "City Name", "stud_gender": "Female", "stud_religion": "Christian", "stud_address": "123 Main Street", "stud_email": "kobid123@gmail.com", "stud_contactNumber": "1234567890", "stud_prevSchool": "Previous School Name", "stud_course": "bsit", "stud_gradeLevel": "12th Grade", "stud_yearGraduated": "2020", "stud_fatherName": "John Rogan", "stud_fatherOccupation": "Engineer", "stud_fatherContactNumber": "9876543210", "stud_motherName": "Mary Rogan", "stud_motherOccupation": "Teacher", "stud_motherContactNumber": "9876543211", "stud_emergencyName": "Emergency Contact Name", "stud_emergencyRelationship": "Relative", "stud_emergencyPhone": "9998887777", "stud_emergencyAddress": "Emergency Contact Address", "user_id": 4}
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
@@ -65,8 +65,7 @@
           $sql .= "stud_school_id) ";
           $sql .= "VALUES(:schoolId, :fullName, :birthday, :birthplace, :gender, :religion, :address, :email, ";
           $sql .= ":contactNumber, :prevSchool, :course, :gradeLevel, :yearGraduated, :fatherName, :fatherOccupation, :fatherContactNumber, ";
-          $sql .= ":motherName, :motherOccupation, :motherContactNumber, :emergencyName, :emergencyRelationship, :emergencyPhone, :emergencyAddress, ";
-          $sql .= ":school_id)";
+          $sql .= ":motherName, :motherOccupation, :motherContactNumber, :emergencyName, :emergencyRelationship, :emergencyPhone, :emergencyAddress, :schoolId) ";
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
           $stmt->bindParam(":fullName", $json["stud_fullName"]);
@@ -91,7 +90,8 @@
           $stmt->bindParam(":emergencyRelationship", $json["stud_emergencyRelationship"]);
           $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
           $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
-          $stmt->bindParam(":school_id", $json["stud_school_id"]);
+          
+          // echo "Sql: " . $sql . "<br/>";
           $stmt->execute();
           if($stmt->rowCount() <= 0) {
             $conn->rollBack();
@@ -102,6 +102,7 @@
           $stmt2->bindParam(':userId', $json["user_id"]);
           $stmt2->bindParam(':studentId', $json["stud_schoolId"]);
           $stmt2->execute();
+          // echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();
           return 1;
         } catch (PDOException $e) {
