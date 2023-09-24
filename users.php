@@ -154,7 +154,7 @@
           $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
           $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
           $stmt->execute();
-          echo "Sql1: " . $sql . "<br/>";
+          // echo "Sql1: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0) {
             $conn->rollBack();
             return 0;
@@ -165,7 +165,7 @@
           $stmt2->bindParam(':userId', $json["user_id"]);
           $stmt2->bindParam(':studId', $json["stud_id"]);
           $stmt2->execute();
-          echo "Sql2: " . $sql2 . "<br/>";
+          // echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();
           return 1;
         } catch (PDOException $e) {
@@ -176,17 +176,57 @@
       }
 
       function deleteStudent($json){
-        //{"studId":3, "studFullName":"kobi","userId":1}
+        //{"stud_id":41,"user_id":4,"stud_fullName":"Joe","stud_schoolId":"9123821","stud_birthday":"02/23/2001","stud_birthplace":"CDO","stud_gender":"FEMALE","stud_religion":"inc","stud_address":"cdo","stud_email":"joe@gmail.com","stud_contactNumber":"0912312312","stud_prevSchool":"mcs","stud_course":"0","stud_gradeLevel":"11","stud_yearGraduated":"2019\\","stud_fatherName":"joe","stud_fatherOccupation":"drive","stud_fatherContactNumber":"012312321","stud_motherName":"mama","stud_motherOccupation":"driver","stud_motherContactNumber":"021321321","stud_emergencyName":"kobid","stud_emergencyRelationship":"dog","stud_emergencyPhone":"01232131","stud_emergencyAddress":"cdo"}
         include "connection.php";
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
-          $sql = "DELETE FROM tblstudents WHERE stud_id = :studId";
+          $sql = "INSERT INTO tbldeletedstudent(delstud_schoolId, delstud_fullName, delstud_birthday, delstud_birthplace, delstud_gender, delstud_religion, delstud_address, delstud_email, ";
+          $sql .= "delstud_contactNumber, delstud_prevSchool, delstud_course, delstud_gradeLevel, delstud_yearGraduated, delstud_fatherName, delstud_fatherOccupation, delstud_fatherContactNumber, ";
+          $sql .= "delstud_motherName, delstud_motherOccupation, delstud_motherContactNumber, delstud_emergencyName, delstud_emergencyRelationship, delstud_emergencyPhone, delstud_emergencyAddress, ";
+          $sql .= "delstud_school_id, delstud_studId) ";
+          $sql .= "VALUES(:schoolId, :fullName, :birthday, :birthplace, :gender, :religion, :address, :email, ";
+          $sql .= ":contactNumber, :prevSchool, :course, :gradeLevel, :yearGraduated, :fatherName, :fatherOccupation, :fatherContactNumber, ";
+          $sql .= ":motherName, :motherOccupation, :motherContactNumber, :emergencyName, :emergencyRelationship, :emergencyPhone, :emergencyAddress, ";
+          $sql .= ":school_id, :studId)";
           $stmt = $conn->prepare($sql);
+          $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
+          $stmt->bindParam(":fullName", $json["stud_fullName"]);
+          $stmt->bindParam(":birthday", $json["stud_birthday"]);
+          $stmt->bindParam(":birthplace", $json["stud_birthplace"]);
+          $stmt->bindParam(":gender", $json["stud_gender"]);
+          $stmt->bindParam(":religion", $json["stud_religion"]);
+          $stmt->bindParam(":address", $json["stud_address"]);
+          $stmt->bindParam(":email", $json["stud_email"]);
+          $stmt->bindParam(":contactNumber", $json["stud_contactNumber"]);
+          $stmt->bindParam(":prevSchool", $json["stud_prevSchool"]);
+          $stmt->bindParam(":course", $json["stud_course"]);
+          $stmt->bindParam(":gradeLevel", $json["stud_gradeLevel"]);
+          $stmt->bindParam(":yearGraduated", $json["stud_yearGraduated"]);
+          $stmt->bindParam(":fatherName", $json["stud_fatherName"]);
+          $stmt->bindParam(":fatherOccupation", $json["stud_fatherOccupation"]);
+          $stmt->bindParam(":fatherContactNumber", $json["stud_fatherContactNumber"]);
+          $stmt->bindParam(":motherName", $json["stud_motherName"]);
+          $stmt->bindParam(":motherOccupation", $json["stud_motherOccupation"]);
+          $stmt->bindParam(":motherContactNumber", $json["stud_motherContactNumber"]);
+          $stmt->bindParam(":emergencyName", $json["stud_emergencyName"]);
+          $stmt->bindParam(":emergencyRelationship", $json["stud_emergencyRelationship"]);
+          $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
+          $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
+          $stmt->bindParam(":school_id", $json["stud_school_id"]);
           $stmt->bindParam(":studId", $json["stud_id"]);
           $stmt->execute();
-          // echo "Sql1: " . $sql . "<br/>";
+          // echo "Sql: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0){
+            $conn->rollback();
+            return 0;
+          }
+          $sql1 = "DELETE FROM tblstudents WHERE stud_id = :studId";
+          $stmt1 = $conn->prepare($sql1);
+          $stmt1->bindParam(":studId", $json["stud_id"]);
+          $stmt1->execute();
+          // echo "Sql1: " . $sql1 . "<br/>";
+          if($stmt1->rowCount() <= 0){
             $conn->rollBack();
             return 0;
           }
@@ -200,7 +240,8 @@
           return 1;
         } catch (PDOException $e) {
           $conn->rollBack();
-          return 0;
+          return "error siya " . $e->getMessage();
+          // "error siya " . $e->getMessage();
         }
       }
     }
