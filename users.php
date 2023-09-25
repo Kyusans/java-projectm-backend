@@ -118,7 +118,7 @@
         $conn->beginTransaction();
         try {
           $sql = "UPDATE tblstudents SET ";
-          $sql .= "stud_fullName = :fullName, stud_birthday = :birthday, stud_birthplace = :birthplace, ";
+          $sql .= "stud_schoolId = :schoolId, stud_fullName = :fullName, stud_birthday = :birthday, stud_birthplace = :birthplace, ";
           $sql .= "stud_gender = :gender, stud_religion = :religion, stud_address = :address, stud_email = :email, ";
           $sql .= "stud_contactNumber = :contactNumber, stud_prevSchool = :prevSchool, stud_course = :course, ";
           $sql .= "stud_gradeLevel = :gradeLevel, stud_yearGraduated = :yearGraduated, ";
@@ -127,7 +127,7 @@
           $sql .= "stud_motherOccupation = :motherOccupation, stud_motherContactNumber = :motherContactNumber, ";
           $sql .= "stud_emergencyName = :emergencyName, stud_emergencyRelationship = :emergencyRelationship, ";
           $sql .= "stud_emergencyPhone = :emergencyPhone, stud_emergencyAddress = :emergencyAddress ";
-          $sql .= "WHERE stud_schoolId = :schoolId";
+          $sql .= "WHERE stud_id = :studId";
           
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(":fullName", $json["stud_fullName"]);
@@ -153,6 +153,7 @@
           $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
           $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
           $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
+          $stmt->bindParam(':studId', $json["stud_id"]);
           $stmt->execute();
           // echo "Sql1: " . $sql . "<br/>";
           if($stmt->rowCount() <= 0) {
@@ -240,7 +241,7 @@
           return 1;
         } catch (PDOException $e) {
           $conn->rollBack();
-          return "error siya " . $e->getMessage();
+          return 0;
           // "error siya " . $e->getMessage();
         }
       }

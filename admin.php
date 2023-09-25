@@ -117,6 +117,21 @@
         return $returnValue;
       }
 
+      function updateAdmin($json){
+        include "connecting.php";
+        $json = json_encode($json);
+
+        $sql = "UPDATE tblusers SET user_username = :username, user_password = :password";
+        $sql .= "WHERE user_id = :user_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':user_id', $json['user_id']);
+        $stmt->bindParam(':user_password', $json['user_password'] );
+        $stmt->bindParam(':user_username', $json['user_name']);
+        $stmt->execute();
+        return $stmt->rowCount() > 0 ? 1 : 0;
+      }
+
       // function recoverStudent($json){
 
       // }
