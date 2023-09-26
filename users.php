@@ -245,6 +245,21 @@
           // "error siya " . $e->getMessage();
         }
       }
+
+      function searchStudent($json){
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT * FROM tblstudents WHERE stud_schoolId = :schoolId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':schoolId',$json["stud_schoolId"]);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->rowCount() > 0){
+          $rs = $stmt->fetch(PDO::FETCH_ASSOC);
+          $returnValue = json_encode($rs);
+        }
+        return $returnValue;
+      }
     }
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
     $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -268,6 +283,9 @@
         break;
       case "deleteStudent":
         echo $user->deleteStudent($json);
+        break;
+      case "searchStudent":
+        echo $user->searchStudent($json);
         break;
     }
 ?>

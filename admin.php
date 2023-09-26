@@ -118,23 +118,25 @@
       }
 
       function updateAdmin($json){
-        include "connecting.php";
-        $json = json_encode($json);
-
-        $sql = "UPDATE tblusers SET user_username = :username, user_password = :password";
-        $sql .= "WHERE user_id = :user_id";
-
+        // {"user_id": 1, "user_username" : "admin", "user_password" : "admin"}
+        include "connection.php";
+        $jsonData = json_decode($json, true);
+    
+        $sql = "UPDATE tblusers SET user_username = :username, user_password = :password ";
+        $sql .= "WHERE user_id = :userId";
+    
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':user_id', $json['user_id']);
-        $stmt->bindParam(':user_password', $json['user_password'] );
-        $stmt->bindParam(':user_username', $json['user_name']);
-        $stmt->execute();
-        return $stmt->rowCount() > 0 ? 1 : 0;
+        $stmt->bindParam(':userId', $jsonData['user_id']);
+        $stmt->bindParam(':password', $jsonData['user_password']);
+        $stmt->bindParam(':username', $jsonData['user_username']);
+        
+        try {
+            $stmt->execute();
+            return $stmt->rowCount() > 0 ? 1 : 0;
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
       }
-
-      // function recoverStudent($json){
-
-      // }
   }    
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -162,6 +164,9 @@
         break;
       case "getDeleteHistory":
         echo $admin->getDeleteHistory();
+        break;
+      case "updateAdmin":
+        echo $admin->updateAdmin($json);
         break;
     }
 ?>
