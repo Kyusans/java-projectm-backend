@@ -260,6 +260,21 @@
         }
         return $returnValue;
       }
+
+      function getAllStudentByStrand($json){
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT * FROM tblstudents WHERE stud_course = :studCourse";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':studCourse',$json["stud_course"]);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->rowCount() > 0){
+          $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          $returnValue = json_encode($rs);
+        }
+        return $returnValue;
+      }
     }
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
     $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -286,6 +301,9 @@
         break;
       case "searchStudent":
         echo $user->searchStudent($json);
+        break;
+      case "getAllStudentByStrand":
+        echo $user->getAllStudentByStrand($json);
         break;
     }
 ?>
