@@ -157,6 +157,8 @@
       }
 
       function retrieveStudent($json){
+        //add ang mga kailangan para ma send
+        // {"delstud_id":4,"delstud_fullName":"mel","delstud_schoolId":"12312321","delstud_birthday":"12\/12\/12","delstud_birthplace":"cdo","delstud_gender":"male","delstud_religion":"inc","delstud_address":"cdo","delstud_email":"mel@gmail.con","delstud_contactNumber":"0912312312","delstud_prevSchool":"mcs","delstud_course":"0","delstud_gradeLevel":"1","delstud_yearGraduated":"2019","delstud_fatherName":"adormie","delstud_fatherOccupation":"teacher","delstud_fatherContactNumber":"anita","delstud_motherName":"housewife","delstud_motherOccupation":"123","delstud_motherContactNumber":"123213","delstud_emergencyName":"kobid","delstud_emergencyRelationship":"dog","delstud_emergencyPhone":"0129312","delstud_emergencyAddress":"cdo","delstud_school_Id":"12312321","delstud_studId":40}
         include "connection.php";
         $json = json_decode($json, true);
         $conn->beginTransaction();
@@ -169,30 +171,30 @@
           $sql .= ":contactNumber, :prevSchool, :course, :gradeLevel, :yearGraduated, :fatherName, :fatherOccupation, :fatherContactNumber, ";
           $sql .= ":motherName, :motherOccupation, :motherContactNumber, :emergencyName, :emergencyRelationship, :emergencyPhone, :emergencyAddress, :schoolId) ";
           $stmt = $conn->prepare($sql);
-          $stmt->bindParam("studId", $json["stud_id"]);
-          $stmt->bindParam(":schoolId", $json["stud_schoolId"]);
-          $stmt->bindParam(":fullName", $json["stud_fullName"]);
-          $stmt->bindParam(":birthday", $json["stud_birthday"]);
-          $stmt->bindParam(":birthplace", $json["stud_birthplace"]);
-          $stmt->bindParam(":gender", $json["stud_gender"]);
-          $stmt->bindParam(":religion", $json["stud_religion"]);
-          $stmt->bindParam(":address", $json["stud_address"]);
-          $stmt->bindParam(":email", $json["stud_email"]);
-          $stmt->bindParam(":contactNumber", $json["stud_contactNumber"]);
-          $stmt->bindParam(":prevSchool", $json["stud_prevSchool"]);
-          $stmt->bindParam(":course", $json["stud_course"]);
-          $stmt->bindParam(":gradeLevel", $json["stud_gradeLevel"]);
-          $stmt->bindParam(":yearGraduated", $json["stud_yearGraduated"]);
-          $stmt->bindParam(":fatherName", $json["stud_fatherName"]);
-          $stmt->bindParam(":fatherOccupation", $json["stud_fatherOccupation"]);
-          $stmt->bindParam(":fatherContactNumber", $json["stud_fatherContactNumber"]);
-          $stmt->bindParam(":motherName", $json["stud_motherName"]);
-          $stmt->bindParam(":motherOccupation", $json["stud_motherOccupation"]);
-          $stmt->bindParam(":motherContactNumber", $json["stud_motherContactNumber"]);
-          $stmt->bindParam(":emergencyName", $json["stud_emergencyName"]);
-          $stmt->bindParam(":emergencyRelationship", $json["stud_emergencyRelationship"]);
-          $stmt->bindParam(":emergencyPhone", $json["stud_emergencyPhone"]);
-          $stmt->bindParam(":emergencyAddress", $json["stud_emergencyAddress"]);
+          $stmt->bindParam(":schoolId", $json["delstud_schoolId"]);
+          $stmt->bindParam(":fullName", $json["delstud_fullName"]);
+          $stmt->bindParam(":birthday", $json["delstud_birthday"]);
+          $stmt->bindParam(":birthplace", $json["delstud_birthplace"]);
+          $stmt->bindParam(":gender", $json["delstud_gender"]);
+          $stmt->bindParam(":religion", $json["delstud_religion"]);
+          $stmt->bindParam(":address", $json["delstud_address"]);
+          $stmt->bindParam(":email", $json["delstud_email"]);
+          $stmt->bindParam(":contactNumber", $json["delstud_contactNumber"]);
+          $stmt->bindParam(":prevSchool", $json["delstud_prevSchool"]);
+          $stmt->bindParam(":course", $json["delstud_course"]);
+          $stmt->bindParam(":gradeLevel", $json["delstud_gradeLevel"]);
+          $stmt->bindParam(":yearGraduated", $json["delstud_yearGraduated"]);
+          $stmt->bindParam(":fatherName", $json["delstud_fatherName"]);
+          $stmt->bindParam(":fatherOccupation", $json["delstud_fatherOccupation"]);
+          $stmt->bindParam(":fatherContactNumber", $json["delstud_fatherContactNumber"]);
+          $stmt->bindParam(":motherName", $json["delstud_motherName"]);
+          $stmt->bindParam(":motherOccupation", $json["delstud_motherOccupation"]);
+          $stmt->bindParam(":motherContactNumber", $json["delstud_motherContactNumber"]);
+          $stmt->bindParam(":emergencyName", $json["delstud_emergencyName"]);
+          $stmt->bindParam(":emergencyRelationship", $json["delstud_emergencyRelationship"]);
+          $stmt->bindParam(":emergencyPhone", $json["delstud_emergencyPhone"]);
+          $stmt->bindParam(":emergencyAddress", $json["delstud_emergencyAddress"]);
+          $stmt->bindParam(":studId", $json["delstud_id"]);
           // echo "Sql: " . $sql . "<br/>";
           $stmt->execute();
           if($stmt->rowCount() <= 0) {
@@ -208,7 +210,7 @@
           return 0;
         }
 
-        $sql2 = "DELETE FROM tbldeletedhistory WHERE delhist_fullName = :fullName";
+        $sql2 = "DELETE FROM tbldeletehistory WHERE delhist_fullName = :fullName";
         $stmt2 = $conn->prepare($sql2);
         $stmt2->bindParam(":fullName", $json["delstud_fullName"]);
         $stmt2->execute();
