@@ -17,6 +17,21 @@
         return $returnValue;
       }
 
+      function getSelectedStaff($json){
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "SELECT * FROM tblusers WHERE user_id = :userId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userId',$json['user_id']);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->rowCount() > 0){
+          $rs = $stmt->fetch(PDO::FETCH_ASSOC);
+          $returnValue = json_encode($rs);
+        }
+        return $returnValue;
+      }
+
       function addStaff($json){
         include "connection.php";
         $json = json_decode($json, true);
@@ -157,7 +172,6 @@
       }
 
       function retrieveStudent($json){
-        //add ang mga kailangan para ma send
         // {"delstud_id":4,"delstud_fullName":"mel","delstud_schoolId":"12312321","delstud_birthday":"12\/12\/12","delstud_birthplace":"cdo","delstud_gender":"male","delstud_religion":"inc","delstud_address":"cdo","delstud_email":"mel@gmail.con","delstud_contactNumber":"0912312312","delstud_prevSchool":"mcs","delstud_course":"0","delstud_gradeLevel":"1","delstud_yearGraduated":"2019","delstud_fatherName":"adormie","delstud_fatherOccupation":"teacher","delstud_fatherContactNumber":"anita","delstud_motherName":"housewife","delstud_motherOccupation":"123","delstud_motherContactNumber":"123213","delstud_emergencyName":"kobid","delstud_emergencyRelationship":"dog","delstud_emergencyPhone":"0129312","delstud_emergencyAddress":"cdo","delstud_school_Id":"12312321","delstud_studId":40}
         include "connection.php";
         $json = json_decode($json, true);
@@ -226,6 +240,9 @@
     switch($operation){
       case "getAllStaff":
         echo $admin->getAllStaff();
+        break;
+      case "getSelectedStaff":
+        echo $admin->getSelectedStaff($json);
         break;
       case "addStaff":
         echo $admin->addStaff($json);
