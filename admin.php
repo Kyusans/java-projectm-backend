@@ -36,12 +36,14 @@
         include "connection.php";
         $json = json_decode($json, true);
         //{"userName":"joey", "password":"joey", "fullName":"Joey Joey", "email":"jioe@gmail.com"}
-        $sql = "INSERT INTO tblusers(user_username, user_password , user_fullName, user_email, user_level) ";
-        $sql .= " VALUES( :userName, :password, :fullName, :email, 90)";
+        $sql = "INSERT INTO tblusers(user_username, user_password , user_fullName, user_email, user_level, user_contactNumber, user_address) ";
+        $sql .= " VALUES( :userName, :password, :fullName, :email, 90, :contactNumber, :address)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":userName", $json["user_username"]);
         $stmt->bindParam(":password", $json["user_password"]);
         $stmt->bindParam(":fullName", $json["user_fullName"]);
+        $stmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        $stmt->bindParam(":address", $json["user_address"]);
         $stmt->bindParam(":email", $json["user_email"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
@@ -49,17 +51,19 @@
 
       function updateStaff($json){
         include "connection.php";
-        // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "email":"jioe@gmail.com", "userId":3}
+        // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "email":"jioe@gmail.com", "userId" : 3}
         $json = json_decode($json, true);
         $sql = "UPDATE tblusers ";
-        $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_email=:email ";
+        $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_email=:email, user_address=:address, user_contactNumber=:contactNumber ";
         $sql .= "WHERE user_id = :userId";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":userName", $json["user_userName"]);
+        $stmt->bindParam(":userName", $json["user_username"]);
         $stmt->bindParam(":password", $json["user_password"]);
         $stmt->bindParam(":fullName", $json["user_fullName"]);
         $stmt->bindParam(":email", $json["user_email"]);
-        $stmt->bindParam(":userId", $json["user_userId"]);
+        $stmt->bindParam(":address", $json["user_address"]);
+        $stmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        $stmt->bindParam(":userId", $json["user_id"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }
@@ -70,7 +74,7 @@
         $json = json_decode($json, true);
         $sql = "DELETE FROM tblusers WHERE user_id = :userId";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":userId", $json["userId"]);
+        $stmt->bindParam(":userId", $json["user_id"]);
         $stmt->execute();
         return $stmt->rowCount() > 0 ? 1 : 0;
       }
@@ -82,7 +86,8 @@
         $sql .= "FROM tblupdatestudenthistory as a ";
         $sql .= "INNER JOIN tblusers as b ON a.uphist_userId = b.user_id ";
         $sql .= "INNER JOIN tblstudents as c ON a.uphist_studId = c.stud_id ";
-        $sql .= "WHERE a.uphist_dateUpdated >= :oneMonthAgo";
+        $sql .= "WHERE a.uphist_dateUpdated >= :oneMonthAgo ";
+        $sql .= "ORDER BY a.uphist_dateUpdated ASC"; 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':oneMonthAgo', $oneMonthAgo, PDO::PARAM_STR);
         $stmt->execute();
@@ -101,7 +106,8 @@
         $sql .= "FROM tbladdstudenthistory as a ";
         $sql .= "INNER JOIN tblusers as b ON a.addhist_userId = b.user_id ";
         $sql .= "INNER JOIN tblstudents as c ON a.addhist_studSchoolId = c.stud_school_id ";
-        $sql .= "WHERE a.addhist_dateAdded >= :oneMonthAgo";
+        $sql .= "WHERE a.addhist_dateAdded >= :oneMonthAgo ";
+        $sql .= "ORDER BY a.addhist_dateAdded ASC"; 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':oneMonthAgo', $oneMonthAgo, PDO::PARAM_STR);
         $stmt->execute();
@@ -119,7 +125,8 @@
         $sql = "SELECT a.delhist_id, a.delhist_dateDeleted, a.delhist_fullName, b.user_fullName ";
         $sql .= "FROM tbldeletehistory as a ";
         $sql .= "INNER JOIN tblusers as b ON a.delhist_userId = b.user_id ";
-        $sql .= "WHERE a.delhist_dateDeleted >= :oneMonthAgo";
+        $sql .= "WHERE a.delhist_dateDeleted >= :oneMonthAgo ";
+        $sql .= "ORDER BY a.delhist_dateDeleted ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':oneMonthAgo', $oneMonthAgo, PDO::PARAM_STR);
     
