@@ -97,10 +97,11 @@
             $conn->rollBack();
             return 0;
           }
-          $sql2 = "INSERT INTO tbladdstudenthistory(addhist_userId, addhist_studSchoolId) VALUES(:userId, :studentId)";
+          $newId = $conn->lastInsertId();
+          $sql2 = "INSERT INTO tbladdstudenthistory(addhist_userId, addhist_studId) VALUES(:userId, :studentId)";
           $stmt2 = $conn->prepare($sql2);
           $stmt2->bindParam(':userId', $json["user_id"]);
-          $stmt2->bindParam(':studentId', $json["stud_schoolId"]);
+          $stmt2->bindParam(':studentId', $newId);
           $stmt2->execute();
           // echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();

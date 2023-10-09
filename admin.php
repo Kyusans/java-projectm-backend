@@ -105,9 +105,9 @@
         $sql = "SELECT a.addhist_dateAdded, b.user_fullName, c.stud_fullName ";
         $sql .= "FROM tbladdstudenthistory as a ";
         $sql .= "INNER JOIN tblusers as b ON a.addhist_userId = b.user_id ";
-        $sql .= "INNER JOIN tblstudents as c ON a.addhist_studSchoolId = c.stud_school_id ";
+        $sql .= "INNER JOIN tblstudents as c ON a.addhist_studId = c.stud_id ";
         $sql .= "WHERE a.addhist_dateAdded >= :oneMonthAgo ";
-        $sql .= "ORDER BY a.addhist_dateAdded ASC"; 
+        $sql .= "ORDER BY a.addhist_id ASC"; 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':oneMonthAgo', $oneMonthAgo, PDO::PARAM_STR);
         $stmt->execute();
