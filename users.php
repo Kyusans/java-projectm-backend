@@ -223,6 +223,7 @@
             $conn->rollback();
             return 0;
           }
+          $newId = $conn->lastInsertId();
           $sql1 = "DELETE FROM tblstudents WHERE stud_id = :studId";
           $stmt1 = $conn->prepare($sql1);
           $stmt1->bindParam(":studId", $json["stud_id"]);
@@ -232,10 +233,10 @@
             $conn->rollBack();
             return 0;
           }
-          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_fullName) VALUES(:userId, :fullName)";
+          $sql2 = "INSERT INTO tbldeletehistory(delhist_userId, delhist_delStudId) VALUES(:userId, :studId)";
           $stmt2 = $conn->prepare($sql2);
           $stmt2->bindParam(":userId", $json["user_id"]);
-          $stmt2->bindParam(":fullName", $json["stud_fullName"]);
+          $stmt2->bindParam(":studId", $newId);
           $stmt2->execute();
           // echo "Sql2: " . $sql2 . "<br/>";
           $conn->commit();
