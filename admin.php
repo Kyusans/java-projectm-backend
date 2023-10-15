@@ -5,7 +5,7 @@
 
       function getAllStaff(){
         include "connection.php";
-        $sql = "SELECT * FROM tblusers WHERE user_level < 100 ORDER BY user_fullName";
+        $sql = "SELECT * FROM tblusers WHERE user_level = 90 ORDER BY user_fullName";
         $stmt = $conn->prepare($sql);
         $returnValue = 0;
         if($stmt->execute()){
@@ -122,14 +122,13 @@
       function getDeleteHistory() {
         include "connection.php";
         $oneMonthAgo = date('Y-m-d', strtotime('-1 month'));
-        $sql = "SELECT a.delhist_id, a.delhist_dateDeleted, a.delhist_fullName, b.user_fullName ";
+        $sql = "SELECT a.delhist_id, a.delhist_dateDeleted, b.user_fullName, c.delstud_fullName ";
         $sql .= "FROM tbldeletehistory as a ";
         $sql .= "INNER JOIN tblusers as b ON a.delhist_userId = b.user_id ";
-        $sql .= "WHERE a.delhist_dateDeleted >= :oneMonthAgo ";
-        $sql .= "ORDER BY a.delhist_dateDeleted ASC";
+        $sql .= "INNER JOIN tbldeletedstudent as c ON a.delhist_delStudId = c.delstud_id ";
+        $sql .= "WHERE a.delhist_dateDeleted >= :oneMonthAgo";
         $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':oneMonthAgo', $oneMonthAgo, PDO::PARAM_STR);
-    
+        $stmt->bindParam(':oneMonthAgo', $oneMonthAgo);
         $stmt->execute();
         $returnValue = 0;
         if ($stmt->rowCount() > 0) {
@@ -163,10 +162,10 @@
       function getSelectedDeletedStudent($json){
         include "connection.php";
         $json = json_decode($json, true);
-        $sql = "SELECT b.* ";
-        $sql .= "FROM tbldeletehistory as a ";
-        $sql .= "INNER JOIN tbldeletedstudent as b ON a.delhist_fullName = b.delstud_fullName ";
-        $sql .= "WHERE a.delhist_id = :delhistId";
+        $sql = "SELECT b.* 
+        FROM tbldeletehistory as a 
+        INNER JOIN tbldeletedstudent as b ON a.delhist_delStudId = b.delstud_id 
+        WHERE a.delhist_id = :delhistId";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':delhistId', $json["delhist_id"]);
         $stmt->execute();
@@ -215,7 +214,7 @@
           $stmt->bindParam(":emergencyRelationship", $json["delstud_emergencyRelationship"]);
           $stmt->bindParam(":emergencyPhone", $json["delstud_emergencyPhone"]);
           $stmt->bindParam(":emergencyAddress", $json["delstud_emergencyAddress"]);
-          $stmt->bindParam(":studId", $json["delstud_id"]);
+          $stmt->bindParam(":studId", $json["delstud_studId"]);
           // echo "Sql: " . $sql . "<br/>";
           $stmt->execute();
           if($stmt->rowCount() <= 0) {
@@ -226,15 +225,17 @@
           $stmt1 = $conn->prepare($sql1);
           $stmt1->bindParam(":delStudId", $json["delstud_id"]);
           $stmt1->execute();
+          // echo "Sql1: " . $sql1 . "<br/>";
         } catch (PDOException $e) {
           $conn->rollBack();
           return 0;
         }
 
-        $sql2 = "DELETE FROM tbldeletehistory WHERE delhist_fullName = :fullName";
+        $sql2 = "DELETE FROM tbldeletehistory WHERE delhist_delStudId = :studId";
         $stmt2 = $conn->prepare($sql2);
-        $stmt2->bindParam(":fullName", $json["delstud_fullName"]);
+        $stmt2->bindParam(":studId", $json["delstud_id"]);
         $stmt2->execute();
+        // echo "Sql2: " . $sql2 . "<br/>";
         $conn->commit();
         return 1;
       }
