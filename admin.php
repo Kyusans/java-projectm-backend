@@ -239,6 +239,18 @@
         $conn->commit();
         return 1;
       }
+
+      function getFaculty(){
+        include "connection.php";
+        $sql = "SELECT * FROM tblusers WHERE user_level = 80 ";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $returnValue = 0;
+        if($stmt->rowCount() > 0){
+          $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return $returnValue;
+      }
   }    
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -278,6 +290,9 @@
         break;
       case "getSelectedDeletedStudent":
         echo $admin->getSelectedDeletedStudent($json);
+        break;
+      case "getFaculty":
+        echo $admin->getFaculty($json);
         break;
     }
 ?>
