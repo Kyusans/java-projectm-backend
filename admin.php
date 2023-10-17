@@ -251,6 +251,22 @@
         }
         return $returnValue;
       }
+
+      function addFaculty($json){
+        include "connection.php";
+        $json = json_decode($json, true);
+        $sql = "INSERT INTO tblusers(user_username, user_password, user_fullName, user_email, user_contactNumber, user_address, user_level ";
+        $sql .= "VALUES(:username, :password, :fullName, :email, :contactNumber, :address, 80)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":username", $json["user_username"]);
+        $stmt->bindParam(":password", $json["user_password"]);
+        $stmt->bindParam(":fullName", $json["user_fullName"]);
+        $stmt->bindParam(":email", $json["user_email"]);
+        $stmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        $stmt->bindParam(":address", $json["user_address"]);
+        $stmt->execute();
+        return $stmt->rowCount() > 0 ? 1 : 0;
+      }
   }    
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -293,6 +309,9 @@
         break;
       case "getFaculty":
         echo $admin->getFaculty($json);
+        break;
+      case "addFaculty":
+        echo $admin->addFaculty($json);
         break;
     }
 ?>
