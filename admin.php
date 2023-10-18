@@ -242,12 +242,13 @@
 
       function getFaculty(){
         include "connection.php";
-        $sql = "SELECT * FROM tblusers WHERE user_level = 80 ";
+        $sql = "SELECT * FROM tblusers WHERE user_level = 80 ORDER BY user_fullName";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $returnValue = 0;
         if($stmt->rowCount() > 0){
-          $returnValue = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          $returnValue = json_encode($rs);
         }
         return $returnValue;
       }
@@ -255,7 +256,7 @@
       function addFaculty($json){
         include "connection.php";
         $json = json_decode($json, true);
-        $sql = "INSERT INTO tblusers(user_username, user_password, user_fullName, user_email, user_contactNumber, user_address, user_level ";
+        $sql = "INSERT INTO tblusers(user_username, user_password, user_fullName, user_email, user_contactNumber, user_address, user_level) ";
         $sql .= "VALUES(:username, :password, :fullName, :email, :contactNumber, :address, 80)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":username", $json["user_username"]);
