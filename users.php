@@ -55,10 +55,44 @@
 
       function addStudent($json){
         include "connection.php";
-        // {"stud_schoolId": "948576", "stud_fullName": "Kobid Rogan", "stud_birthday": "1995-05-15", "stud_birthplace": "City Name", "stud_gender": "Female", "stud_religion": "Christian", "stud_address": "123 Main Street", "stud_email": "kobid123@gmail.com", "stud_contactNumber": "1234567890", "stud_prevSchool": "Previous School Name", "stud_course": "bsit", "stud_gradeLevel": "12th Grade", "stud_yearGraduated": "2020", "stud_fatherName": "John Rogan", "stud_fatherOccupation": "Engineer", "stud_fatherContactNumber": "9876543210", "stud_motherName": "Mary Rogan", "stud_motherOccupation": "Teacher", "stud_motherContactNumber": "9876543211", "stud_emergencyName": "Emergency Contact Name", "stud_emergencyRelationship": "Relative", "stud_emergencyPhone": "9998887777", "stud_emergencyAddress": "Emergency Contact Address", "user_id": 4}
+
         $json = json_decode($json, true);
         $conn->beginTransaction();
+        if (empty($json["stud_schoolId"])) {
+          // School ID is empty
+          return -4;
+      }
+    
         try {
+            // Check for duplicates by school ID
+            $checkDuplicateSql = "SELECT stud_id FROM tblstudents WHERE stud_schoolId = :schoolId";
+            $stmtDuplicateCheck = $conn->prepare($checkDuplicateSql);
+            $stmtDuplicateCheck->bindParam(":schoolId", $json["stud_schoolId"]);
+            $stmtDuplicateCheck->execute();
+    
+            if ($stmtDuplicateCheck->rowCount() > 0) {
+                // Duplicate found
+                return -1;
+            }
+    
+            // Check for duplicates by full name (You can customize this based on your requirements)
+            $checkNameDuplicateSql = "SELECT stud_id FROM tblstudents WHERE stud_fullName = :fullName";
+            $stmtNameDuplicateCheck = $conn->prepare($checkNameDuplicateSql);
+            $stmtNameDuplicateCheck->bindParam(":fullName", $json["stud_fullName"]);
+            $stmtNameDuplicateCheck->execute();
+    
+            if ($stmtNameDuplicateCheck->rowCount() > 0) {
+                // Duplicate found
+                return -2;
+            }
+    
+            // Validate the graduated year (assuming "stud_yearGraduated" format is YYYY)
+            $currentYear = date("Y");
+            $graduatedYear = intval($json["stud_yearGraduated"]);
+            if ($graduatedYear > $currentYear) {
+                // Graduated year is in the future
+                return -3;
+            }
           $sql = "INSERT INTO tblstudents(stud_schoolId, stud_fullName, stud_birthday, stud_birthplace, stud_gender, stud_religion, stud_address, stud_email, ";
           $sql .= "stud_contactNumber, stud_prevSchool, stud_course, stud_gradeLevel, stud_yearGraduated, stud_fatherName, stud_fatherOccupation, stud_fatherContactNumber, ";
           $sql .= "stud_motherName, stud_motherOccupation, stud_motherContactNumber, stud_emergencyName, stud_emergencyRelationship, stud_emergencyPhone, stud_emergencyAddress, ";
