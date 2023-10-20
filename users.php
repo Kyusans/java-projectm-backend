@@ -61,7 +61,7 @@
         if (empty($json["stud_schoolId"])) {
           // School ID is empty
           return -4;
-      }
+        }
     
         try {
             // Check for duplicates by school ID
@@ -152,6 +152,13 @@
         $json = json_decode($json, true);
         $conn->beginTransaction();
         try {
+          // Validate the graduated year (assuming "stud_yearGraduated" format is YYYY)
+          $currentYear = date("Y");
+          $graduatedYear = intval($json["stud_yearGraduated"]);
+          if ($graduatedYear > $currentYear) {
+              // Graduated year is in the future
+              return -1;
+          }
           $sql = "UPDATE tblstudents SET ";
           $sql .= "stud_schoolId = :schoolId, stud_fullName = :fullName, stud_birthday = :birthday, stud_birthplace = :birthplace, ";
           $sql .= "stud_gender = :gender, stud_religion = :religion, stud_address = :address, stud_email = :email, ";

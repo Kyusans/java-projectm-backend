@@ -34,7 +34,65 @@
 
       function addStaff($json){
         include "connection.php";
+        
         $json = json_decode($json, true);
+        // Validation for username
+        $checkUsernameQuery = "SELECT COUNT(*) FROM tblusers WHERE user_username = :username";
+        $checkUsernameStmt = $conn->prepare($checkUsernameQuery);
+        $checkUsernameStmt->bindParam(":username", $json["user_username"]);
+        $checkUsernameStmt->execute();
+        $count = $checkUsernameStmt->fetchColumn();
+    
+        if ($count > 0) {
+            return -1; // Username already exists. Please choose a different username.
+        }
+    
+        // Validation for full name
+        if (empty($json["user_fullName"])) {
+            return -2; // Full name cannot be empty. Please provide a full name.
+        }
+        // Check if the full name already exists in the database
+        $checkFullNameQuery = "SELECT COUNT(*) FROM tblusers WHERE user_fullName = :fullName";
+        $checkFullNameStmt = $conn->prepare($checkFullNameQuery);
+        $checkFullNameStmt->bindParam(":fullName", $json["user_fullName"]);
+        $checkFullNameStmt->execute();
+        $fullNameCount = $checkFullNameStmt->fetchColumn();
+
+        if ($fullNameCount > 0) {
+            return -3; // Full name already exists. Please use a different full name.
+        }
+    
+        // Validation for email
+        if (empty($json["user_email"]) || !filter_var($json["user_email"], FILTER_VALIDATE_EMAIL)) {
+            return -4; // Invalid email format. Please provide a valid email address.
+        }
+
+        if (empty($json["user_username"]) || !preg_match("/^[a-zA-Z0-9_]{3,20}$/", $json["user_username"])) {
+          return -5; // Invalid username format. It must be 3-20 characters containing only letters, numbers, and underscores.
+        }
+
+        // Validation for email
+        $checkEmailQuery = "SELECT COUNT(*) FROM tblusers WHERE user_email = :email";
+        $checkEmailStmt = $conn->prepare($checkEmailQuery);
+        $checkEmailStmt->bindParam(":email", $json["user_email"]);
+        $checkEmailStmt->execute();
+        $emailCount = $checkEmailStmt->fetchColumn();
+
+        if ($emailCount > 0) {
+            return -6; // Email already exists. Please use a different email address.
+        }
+
+        // Validation for contact number
+        $checkContactNumberQuery = "SELECT COUNT(*) FROM tblusers WHERE user_contactNumber = :contactNumber AND user_id != :userId";
+        $checkContactNumberStmt = $conn->prepare($checkContactNumberQuery);
+        $checkContactNumberStmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        $checkContactNumberStmt->bindParam(":userId", $json["user_id"]);
+        $checkContactNumberStmt->execute();
+        $contactNumberCount = $checkContactNumberStmt->fetchColumn();
+
+        if ($contactNumberCount > 0) {
+            return -7; // Contact number already exists. Please use a different contact number.
+        }
         //{"userName":"joey", "password":"joey", "fullName":"Joey Joey", "email":"jioe@gmail.com"}
         $sql = "INSERT INTO tblusers(user_username, user_password , user_fullName, user_email, user_level, user_contactNumber, user_address) ";
         $sql .= " VALUES( :userName, :password, :fullName, :email, 90, :contactNumber, :address)";
@@ -53,6 +111,56 @@
         include "connection.php";
         // {"userName":"joeeeee", "password":"joe123", "fullName":"Joey Joey", "email":"jioe@gmail.com", "userId" : 3}
         $json = json_decode($json, true);
+        include "connection.php";
+
+        // Validation for username
+        $checkUsernameQuery = "SELECT COUNT(*) FROM tblusers WHERE user_username = :userName AND user_id != :userId";
+        $checkUsernameStmt = $conn->prepare($checkUsernameQuery);
+        $checkUsernameStmt->bindParam(":userName", $json["user_username"]);
+        $checkUsernameStmt->bindParam(":userId", $json["user_id"]);
+        $checkUsernameStmt->execute();
+        $count = $checkUsernameStmt->fetchColumn();
+
+        if ($count > 0) {
+            return -1; // Username already exists. Please choose a different username.
+        }
+
+        // Validation for full name
+        $checkFullNameQuery = "SELECT COUNT(*) FROM tblusers WHERE user_fullName = :fullName AND user_id != :userId";
+        $checkFullNameStmt = $conn->prepare($checkFullNameQuery);
+        $checkFullNameStmt->bindParam(":fullName", $json["user_fullName"]);
+        $checkFullNameStmt->bindParam(":userId", $json["user_id"]);
+        $checkFullNameStmt->execute();
+        $fullNameCount = $checkFullNameStmt->fetchColumn();
+
+        if ($fullNameCount > 0) {
+            return -2; // Full name already exists. Please use a different full name.
+        }
+
+        // // Validation for email
+        // $checkEmailQuery = "SELECT COUNT(*) FROM tblusers WHERE user_email = :email AND user_id != :userId";
+        // $checkEmailStmt = $conn->prepare($checkEmailQuery);
+        // $checkEmailStmt->bindParam(":email", $json["user_email"]);
+        // $checkEmailStmt->bindParam(":userId", $json["user_id"]);
+        // $checkEmailStmt->execute();
+        // $emailCount = $checkEmailStmt->fetchColumn();
+
+        // if ($emailCount > 0) {
+        //     return -3; // Email already exists. Please use a different email address.
+        // }
+        
+
+        // // Validation for contact number
+        // $checkContactNumberQuery = "SELECT COUNT(*) FROM tblusers WHERE user_contactNumber = :contactNumber AND user_id != :userId";
+        // $checkContactNumberStmt = $conn->prepare($checkContactNumberQuery);
+        // $checkContactNumberStmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        // $checkContactNumberStmt->bindParam(":userId", $json["user_id"]);
+        // $checkContactNumberStmt->execute();
+        // $contactNumberCount = $checkContactNumberStmt->fetchColumn();
+
+        // if ($contactNumberCount > 0) {
+        //     return -4; // Contact number already exists. Please use a different contact number.
+        // }
         $sql = "UPDATE tblusers ";
         $sql .= "SET user_username=:userName, user_password=:password, user_fullName=:fullName, user_email=:email, user_address=:address, user_contactNumber=:contactNumber ";
         $sql .= "WHERE user_id = :userId";
@@ -253,9 +361,46 @@
         return $returnValue;
       }
 
-      function addFaculty($json){
+      function addFaculty($json) {
         include "connection.php";
         $json = json_decode($json, true);
+    
+        // Validation for username
+        $checkUsernameQuery = "SELECT COUNT(*) FROM tblusers WHERE user_username = :username";
+        $checkUsernameStmt = $conn->prepare($checkUsernameQuery);
+        $checkUsernameStmt->bindParam(":username", $json["user_username"]);
+        $checkUsernameStmt->execute();
+        $count = $checkUsernameStmt->fetchColumn();
+    
+        if ($count > 0) {
+            return -1; // Username already exists. Please choose a different username.
+        }
+    
+        // Validation for full name
+        if (empty($json["user_fullName"])) {
+            return -2; // Full name cannot be empty. Please provide a full name.
+        }
+    
+        // Validation for email (only for new staff members, not for updates)
+        if (empty($json["user_email"]) || !filter_var($json["user_email"], FILTER_VALIDATE_EMAIL)) {
+            return -4; // Invalid email format. Please provide a valid email address.
+        }
+    
+        if (empty($json["user_username"]) || !preg_match("/^[a-zA-Z0-9_]{3,20}$/", $json["user_username"])) {
+            return -5; // Invalid username format. It must be 3-20 characters containing only letters, numbers, and underscores.
+        }
+    
+        // Validation for contact number
+        $checkContactNumberQuery = "SELECT COUNT(*) FROM tblusers WHERE user_contactNumber = :contactNumber";
+        $checkContactNumberStmt = $conn->prepare($checkContactNumberQuery);
+        $checkContactNumberStmt->bindParam(":contactNumber", $json["user_contactNumber"]);
+        $checkContactNumberStmt->execute();
+        $contactNumberCount = $checkContactNumberStmt->fetchColumn();
+    
+        if ($contactNumberCount > 0) {
+            return -7; // Contact number already exists. Please use a different contact number.
+        }
+    
         $sql = "INSERT INTO tblusers(user_username, user_password, user_fullName, user_email, user_contactNumber, user_address, user_level) ";
         $sql .= "VALUES(:username, :password, :fullName, :email, :contactNumber, :address, 80)";
         $stmt = $conn->prepare($sql);
@@ -266,8 +411,11 @@
         $stmt->bindParam(":contactNumber", $json["user_contactNumber"]);
         $stmt->bindParam(":address", $json["user_address"]);
         $stmt->execute();
+    
         return $stmt->rowCount() > 0 ? 1 : 0;
-      }
+    }
+    
+    
   }    
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
